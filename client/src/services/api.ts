@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_URL = import.meta.env.VITE_API_URL || ''
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -17,4 +17,12 @@ export async function apiRequest<T>(
   }
 
   return response.json() as Promise<T>
+}
+
+export interface HealthResponse {
+  status: string
+  message: string
+}
+export function getHealth() {
+  return apiRequest<HealthResponse>('/api/health')
 }
