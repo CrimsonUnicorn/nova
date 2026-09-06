@@ -1,5 +1,12 @@
+import PageTitle from '../components/PageTitle'
+
 function Dashboard() {
-  return <h1>Dashboard</h1>
+  return (
+    <PageTitle
+      title="Dashboard"
+      description="Welcome to NOVA."
+    />
+  )
 }
 
 export default Dashboard
