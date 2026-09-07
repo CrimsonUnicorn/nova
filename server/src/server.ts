@@ -1,6 +1,7 @@
 import express  from "express";
 import 'dotenv/config'
 import cors from 'cors'
+import { connectDatabase } from './config/database.js'
 
 import healthRoutes from './routes/healthRoutes.js'
 
@@ -21,6 +22,12 @@ app.use('/api/health', healthRoutes)
 app.get("/", (req, res) => {
   res.send("NOVA API is working!");
 });
+
+connectDatabase().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`NOVA API running on port ${PORT}`)
+  })
+})
 
 app.listen(Number(process.env.PORT) || 5000, "0.0.0.0" ,() => {
   console.log(`NOVA API running on port ${PORT}`)
