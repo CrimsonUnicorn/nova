@@ -24,11 +24,8 @@ app.get("/", (req, res) => {
 });
 
 connectDatabase().then(() => {
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(Number(process.env.PORT), '0.0.0.0', () => {
     console.log(`NOVA API running on port ${PORT}`)
   })
 })
 
-app.listen(Number(process.env.PORT) || 5000, "0.0.0.0" ,() => {
-  console.log(`NOVA API running on port ${PORT}`)
-})
