@@ -12,11 +12,13 @@ export async function apiRequest<T>(
     },
   })
 
+  const data = await response.json()
+
   if (!response.ok) {
-    throw new Error('API request failed')
+    throw new Error(data.message || `API request failed: ${response.status}`)
   }
 
-  return response.json() as Promise<T>
+  return data as T
 }
 
 export interface HealthResponse {
