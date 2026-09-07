@@ -2,7 +2,7 @@ import express  from "express";
 import 'dotenv/config'
 import cors from 'cors'
 import { connectDatabase } from './config/database.js'
-
+import authRoutes from './routes/authRoutes.js'
 import healthRoutes from './routes/healthRoutes.js'
 
 const app = express()
@@ -18,6 +18,7 @@ app.use(
 app.use(express.json())
 
 app.use('/api/health', healthRoutes)
+app.use('/api/auth', authRoutes)
 
 app.get("/", (req, res) => {
   res.send("NOVA API is working!");
