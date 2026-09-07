@@ -17,6 +17,11 @@ export interface RegisterResponse {
   user: AuthUser
 }
 
+export interface CurrentUserResponse {
+  user: AuthUser
+}
+
+
 export async function registerUser(
   name: string,
   email: string,
@@ -42,5 +47,15 @@ export async function loginUser(
       email,
       password,
     }),
+  })
+}
+
+export async function getCurrentUser(): Promise<CurrentUserResponse> {
+  const token = localStorage.getItem('nova_token')
+
+  return apiRequest<CurrentUserResponse>('/api/auth/me', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   })
 }

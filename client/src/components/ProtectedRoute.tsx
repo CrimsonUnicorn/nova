@@ -1,11 +1,20 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 
-import { isAuthenticated } from '../services/auth'
+import { useAuth } from '../context/AuthContext'
 
 function ProtectedRoute() {
+  const { user, loading } = useAuth()
   const location = useLocation()
 
-  if (!isAuthenticated()) {
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    )
+  }
+
+  if (!user) {
     return (
       <Navigate
         to="/login"

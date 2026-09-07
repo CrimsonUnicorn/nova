@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 
 import User from '../models/User.js'
 import { hashPassword, comparePassword, generateToken } from '../services/authService.js'
+import { authMiddleware } from '../middleware/authMiddleware.js'
 
 export async function register(
   req: Request,
@@ -102,6 +103,41 @@ export async function login(
     })
   } catch (error) {
     console.error('Login error:', error)
+
+    return res.status(500).json({
+      message: 'Internal server error',
+    })
+  }
+}
+
+export async function getCurrentUser(
+  req: Request,
+  res: Response,
+) {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({
+        message: 'Authentication required',
+      })
+    }
+
+    const user = await User.findById(req.userId)
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'User not found',
+      })
+    }
+
+    return res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    })
+  } catch (error) {
+    console.error('Get current user error:', error)
 
     return res.status(500).json({
       message: 'Internal server error',
