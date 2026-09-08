@@ -1,33 +1,51 @@
-import { useEffect, useState } from 'react'
 import PageTitle from '../components/PageTitle'
-import { getHealth } from '../services/api'
+import Card from '../components/Card'
 
 function Dashboard() {
-  const [message, setMessage] = useState('Checking API...')
-  const [error, setError] = useState('')
-
-  useEffect(() => {
-    getHealth()
-      .then((data) => {
-        setMessage(data.message)
-      })
-      .catch(() => {
-        setError('Unable to connect to NOVA API.')
-      })
-  }, [])
-
   return (
-    <div className="space-y-4">
+    <div>
       <PageTitle
         title="Dashboard"
-        description="Welcome to NOVA."
+        description="Overview of your team's productivity and projects."
       />
 
-      {error ? (
-        <p className="text-red-600">{error}</p>
-      ) : (
-        <p className="text-green-600">{message}</p>
-      )}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <p className="text-sm text-gray-500">Total Projects</p>
+          <p className="mt-2 text-3xl font-bold">0</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm text-gray-500">Total Tasks</p>
+          <p className="mt-2 text-3xl font-bold">0</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm text-gray-500">Completed Tasks</p>
+          <p className="mt-2 text-3xl font-bold">0</p>
+        </Card>
+
+        <Card>
+          <p className="text-sm text-gray-500">Team Members</p>
+          <p className="mt-2 text-3xl font-bold">0</p>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <h2 className="text-lg font-semibold">Recent Projects</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Your recent projects will appear here.
+          </p>
+        </Card>
+
+        <Card>
+          <h2 className="text-lg font-semibold">Recent Tasks</h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Your recent tasks will appear here.
+          </p>
+        </Card>
+      </div>
     </div>
   )
 }
