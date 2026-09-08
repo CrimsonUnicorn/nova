@@ -4,6 +4,8 @@ import cors from 'cors'
 import { connectDatabase } from './config/database.js'
 import authRoutes from './routes/authRoutes.js'
 import healthRoutes from './routes/healthRoutes.js'
+import projectRoutes from "./routes/projectRoutes.js";
+
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -19,6 +21,7 @@ app.use(express.json())
 
 app.use('/api/health', healthRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/projects', projectRoutes)
 
 app.get("/", (req, res) => {
   res.send("NOVA API is working!");
