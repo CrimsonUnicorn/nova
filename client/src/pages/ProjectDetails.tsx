@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import PageTitle from '../components/PageTitle'
 import Card from '../components/Card'
 import Button from '../components/Button'
+import type { SyntheticEvent } from 'react'
+
 import { apiRequest } from '../services/api'
 import {
   addProjectMember,
@@ -10,8 +12,13 @@ import {
   removeProjectMember,
   type ProjectMember,
 } from '../services/memberServices'
-
-import { getProjectTasks, type Task } from '../services/taskService'
+import {
+  assignTask,
+  createTask,
+  getProjectTasks,
+  updateTask,
+  type Task,
+} from '../services/taskService'
 
 interface Project {
   _id: string
@@ -35,9 +42,23 @@ function ProjectDetails() {
   const [userId, setUserId] = useState('')
   const [memberError, setMemberError] = useState('')
   const [memberLoading, setMemberLoading] = useState(false)
+
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskError, setTaskError] = useState('')
+  const [taskTitle, setTaskTitle] = useState('')
+  const [taskDescription, setTaskDescription] = useState('')
+  const [taskPriority, setTaskPriority] = useState<
+    'low' | 'medium' | 'high'
+  >('medium')
+  const [taskDueDate, setTaskDueDate] = useState('')
+  const [creatingTask, setCreatingTask] = useState(false)
+  const [createTaskError, setCreateTaskError] = useState('')
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null)
+  const [updateTaskError, setUpdateTaskError] = useState('')
+  const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null)
+  const [assignTaskError, setAssignTaskError] = useState('')
 
+  { /loads the project/ }
   useEffect(() => {
     async function loadProject() {
       if (!id) {
@@ -65,7 +86,7 @@ function ProjectDetails() {
 
     void loadProject()
   }, [id])
-
+  { /loads team members/ }
   useEffect(() => {
     if (!id) return
 
@@ -86,31 +107,12 @@ function ProjectDetails() {
 
     void loadMembers()
   }, [id])
-
+  { /loads tasks/ }
   useEffect(() => {
     if (!id) return
 
-    const projectId = id
-
-    async function loadTasks() {
-      try {
-        setTaskError('')
-
-        const data = await getProjectTasks(projectId)
-
-        setTasks(data)
-      } catch (err) {
-        setTaskError(
-          err instanceof Error
-            ? err.message
-            : 'Failed to load project tasks',
-        )
-      }
-    }
-
-    void loadTasks()
+    void refreshTasks(id)
   }, [id])
-
 
   async function handleDelete() {
     if (!id) return
@@ -189,6 +191,113 @@ function ProjectDetails() {
           ? err.message
           : 'Failed to remove project member',
       )
+    }
+  }
+
+  async function refreshTasks(projectId: string) {
+    try {
+      setTaskError('')
+
+      const updatedTasks = await getProjectTasks(projectId)
+
+      setTasks(updatedTasks)
+    } catch (err) {
+      setTaskError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load project tasks',
+      )
+    }
+  }
+
+  async function handleCreateTask(event: SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!id) return
+
+    try {
+      setCreatingTask(true)
+      setCreateTaskError('')
+
+      await createTask({
+        title: taskTitle,
+        description: taskDescription || undefined,
+        priority: taskPriority,
+        project: id,
+        dueDate: taskDueDate || undefined,
+      })
+
+      setTaskTitle('')
+      setTaskDescription('')
+      setTaskPriority('medium')
+      setTaskDueDate('')
+
+      await refreshTasks(id)
+    } catch (err) {
+      setCreateTaskError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to create task',
+      )
+    } finally {
+      setCreatingTask(false)
+    }
+  }
+
+  async function handleUpdateTask(
+    taskId: string,
+    data: {
+      status?: 'todo' | 'in-progress' | 'completed'
+      priority?: 'low' | 'medium' | 'high'
+    },
+  ) {
+    try {
+      setUpdatingTaskId(taskId)
+      setUpdateTaskError('')
+
+      const updatedTask = await updateTask(taskId, data)
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task._id === updatedTask._id ? updatedTask : task,
+        ),
+      )
+    } catch (err) {
+      setUpdateTaskError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to update task',
+      )
+    } finally {
+      setUpdatingTaskId(null)
+    }
+  }
+
+  async function handleAssignTask(
+    taskId: string,
+    memberId: string,
+  ) {
+    if (!memberId) return
+
+    try {
+      setAssigningTaskId(taskId)
+      setAssignTaskError('')
+
+      const updatedTask = await assignTask(taskId, memberId)
+
+      setTasks((currentTasks) =>
+        currentTasks.map((task) =>
+          task._id === updatedTask._id ? updatedTask : task,
+        ),
+      )
+    } catch (err) {
+      setAssignTaskError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to assign task',
+      )
+    } finally {
+      setAssigningTaskId(null)
     }
   }
 
@@ -345,7 +454,97 @@ function ProjectDetails() {
         </div>
       </Card>
 
-      {/* Tasks */}
+      {/* Create task form */}
+      <form
+        onSubmit={handleCreateTask}
+        className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4"
+      >
+        <h3 className="mb-4 font-medium text-gray-900">
+          Create Task
+        </h3>
+
+        {createTaskError && (
+          <p className="mb-3 text-sm text-red-600">
+            {createTaskError}
+          </p>
+        )}
+
+        <div className="space-y-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Title
+            </label>
+
+            <input
+              type="text"
+              value={taskTitle}
+              onChange={(event) => setTaskTitle(event.target.value)}
+              placeholder="Enter task title"
+              required
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Description
+            </label>
+
+            <textarea
+              value={taskDescription}
+              onChange={(event) => setTaskDescription(event.target.value)}
+              placeholder="Enter task description"
+              rows={3}
+              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Priority
+              </label>
+
+              <select
+                value={taskPriority}
+                onChange={(event) =>
+                  setTaskPriority(
+                    event.target.value as 'low' | 'medium' | 'high',
+                  )
+                }
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">
+                Due Date
+              </label>
+
+              <input
+                type="date"
+                value={taskDueDate}
+                onChange={(event) => setTaskDueDate(event.target.value)}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={creatingTask}
+            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {creatingTask ? 'Creating...' : 'Create Task'}
+          </button>
+        </div>
+      </form>
+
+      {/* Tasks list */}
       <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -362,6 +561,16 @@ function ProjectDetails() {
             {taskError}
           </p>
         )}
+        {updateTaskError && (
+          <p className="mb-4 text-sm text-red-600">
+            {updateTaskError}
+          </p>
+        )}
+        {assignTaskError && (
+          <p className="mb-4 text-sm text-red-600">
+            {assignTaskError}
+          </p>
+        )}
 
         {tasks.length === 0 && !taskError ? (
           <p className="text-sm text-gray-500">
@@ -374,11 +583,18 @@ function ProjectDetails() {
                 key={task._id}
                 className="rounded-lg border border-gray-200 p-4"
               >
+                <Link to={`/tasks/${task._id}`}>
+                  <h3 className="font-medium text-gray-900 hover:underline">
+                    {task.title}
+                  </h3>
+                </Link>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="font-medium text-gray-900">
-                      {task.title}
-                    </h3>
+                    <Link to={`/tasks/${task._id}`}>
+                      <h3 className="font-medium text-gray-900 hover:underline">
+                        {task.title}
+                      </h3>
+                    </Link>
 
                     {task.description && (
                       <p className="mt-1 text-sm text-gray-600">
@@ -387,21 +603,66 @@ function ProjectDetails() {
                     )}
                   </div>
 
-                  <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium capitalize text-gray-700">
-                    {task.status}
-                  </span>
+                  <select
+                    value={task.status}
+                    disabled={updatingTaskId === task._id}
+                    onChange={(event) =>
+                      void handleUpdateTask(task._id, {
+                        status: event.target.value as
+                          | 'todo'
+                          | 'in-progress'
+                          | 'completed',
+                      })
+                    }
+                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                  >
+                    <option value="todo">Todo</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                  </select>
                 </div>
 
-                <div className="mt-3 flex gap-4 text-xs text-gray-500">
-                  <span>
-                    Priority: {task.priority}
-                  </span>
+                <div className="mt-3 flex flex-wrap items-center gap-4">
+                  <select
+                    value={task.priority}
+                    disabled={updatingTaskId === task._id}
+                    onChange={(event) =>
+                      void handleUpdateTask(task._id, {
+                        priority: event.target.value as
+                          | 'low'
+                          | 'medium'
+                          | 'high',
+                      })
+                    }
+                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
 
                   {task.dueDate && (
-                    <span>
+                    <span className="text-xs text-gray-500">
                       Due: {new Date(task.dueDate).toLocaleDateString()}
                     </span>
                   )}
+
+                  <select
+                    value={task.assignedTo || ''}
+                    disabled={assigningTaskId === task._id}
+                    onChange={(event) =>
+                      void handleAssignTask(task._id, event.target.value)
+                    }
+                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                  >
+                    <option value="">Assign to...</option>
+
+                    {members.map((member) => (
+                      <option key={member._id} value={member._id}>
+                        {member.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             ))}
