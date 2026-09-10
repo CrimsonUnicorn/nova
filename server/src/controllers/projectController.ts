@@ -219,3 +219,151 @@ export async function deleteProject(
     })
   }
 }
+
+export async function addProjectMember(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const { id } = req.params
+    const { userId } = req.body
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({ message: 'Invalid project ID' })
+      return
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      res.status(400).json({ message: 'Invalid user ID' })
+      return
+    }
+
+    if (!req.userId) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    const project = await Project.findOne({
+      _id: id,
+      owner: req.userId,
+    })
+
+    if (!project) {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+    
+    if (req.userId === userId) {
+  res.status(400).json({
+    message: 'Project owner cannot be added as a member',
+  })
+  return
+}
+
+    if (project.members.some((member) => member.toString() === userId)) {
+      res.status(400).json({ message: 'User is already a project member' })
+      return
+    }
+
+    project.members.push(new mongoose.Types.ObjectId(userId))
+    await project.save()
+
+    res.status(200).json(project)
+  } catch (error) {
+    console.error('Add project member error:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+export async function getProjectMembers(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const { id } = req.params
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({ message: 'Invalid project ID' })
+      return
+    }
+
+    if (!req.userId) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    const project = await Project.findOne({
+      _id: id,
+      owner: req.userId,
+    }).populate('members', 'name email')
+
+    if (!project) {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+
+    res.status(200).json(project.members)
+  } catch (error) {
+    console.error('Get project members error:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
+export async function removeProjectMember(
+  req: Request,
+  res: Response,
+): Promise<void> {
+  try {
+    const { id, userId } = req.params
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({ message: 'Invalid project ID' })
+      return
+    }
+
+    if (!mongoose.isValidObjectId(userId)) {
+      res.status(400).json({ message: 'Invalid user ID' })
+      return
+    }
+
+    if (!req.userId) {
+      res.status(401).json({ message: 'Unauthorized' })
+      return
+    }
+
+    const project = await Project.findOne({
+      _id: id,
+      owner: req.userId,
+    })
+
+    if (!project) {
+      res.status(404).json({ message: 'Project not found' })
+      return
+    }
+
+    const memberExists = project.members.some(
+      (member) => member.toString() === userId,
+    )
+
+    if (!memberExists) {
+      res.status(404).json({
+        message: 'User is not a project member',
+      })
+      return
+    }
+
+    project.members = project.members.filter(
+      (member) => member.toString() !== userId,
+    )
+
+    await project.save()
+
+    res.status(200).json({
+      message: 'Project member removed successfully',
+    })
+  } catch (error) {
+    console.error('Remove project member error:', error)
+    res.status(500).json({ message: 'Server error' })
+  }
+}
+
