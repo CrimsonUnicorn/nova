@@ -11,12 +11,15 @@ function Button({
   ...props
 }: ButtonProps) {
   const baseStyles =
-    'rounded-md px-4 py-2 text-sm font-medium transition-colors'
+    'rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50'
 
   const variantStyles = {
-    primary: 'bg-gray-900 text-white hover:bg-gray-800',
-    secondary: 'border bg-white text-gray-700 hover:bg-gray-50',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    primary:
+      'bg-indigo-600 text-white hover:bg-indigo-500',
+    secondary:
+      'border border-gray-700 bg-gray-900 text-gray-300 hover:bg-gray-800 hover:text-white',
+    danger:
+      'bg-red-600 text-white hover:bg-red-500',
   }
 
   return (

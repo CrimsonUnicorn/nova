@@ -120,6 +120,7 @@ function TaskDetails() {
       setCommentSubmitting(false)
     }
   }
+
   async function handleDeleteComment(commentId: string) {
     const confirmed = window.confirm(
       'Are you sure you want to delete this comment?',
@@ -149,25 +150,26 @@ function TaskDetails() {
     }
   }
 
-
   if (loading) {
     return (
-      <p className="text-sm text-gray-500">
-        Loading task...
-      </p>
+      <div className="mx-auto max-w-7xl">
+        <p className="text-sm text-gray-500">
+          Loading task...
+        </p>
+      </div>
     )
   }
 
   if (error || !task) {
     return (
-      <div>
+      <div className="mx-auto max-w-7xl">
         <PageTitle
           title="Task Details"
           description="View task information."
         />
 
         <Card>
-          <p className="text-sm text-red-600">
+          <p className="text-sm text-red-400">
             {error || 'Task not found'}
           </p>
 
@@ -175,7 +177,7 @@ function TaskDetails() {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-3 text-sm font-medium text-red-700 underline"
+              className="mt-3 text-sm font-medium text-red-400 underline hover:text-red-300"
             >
               Try again
             </button>
@@ -195,63 +197,64 @@ function TaskDetails() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-7xl">
       <PageTitle
         title={task.title}
         description="View task details."
       />
 
+      {/* Task information */}
       <Card>
-        <div className="space-y-6">
+        <div className="space-y-7">
           <div>
             <h2 className="text-sm font-medium text-gray-500">
               Description
             </h2>
 
-            <p className="mt-2 text-gray-900">
+            <p className="mt-2 text-sm leading-7 text-gray-300">
               {task.description || 'No description provided.'}
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <h2 className="text-sm font-medium text-gray-500">
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
                 Status
               </h2>
 
-              <p className="mt-1 capitalize text-gray-900">
+              <p className="mt-2 capitalize text-gray-200">
                 {task.status}
               </p>
             </div>
 
-            <div>
-              <h2 className="text-sm font-medium text-gray-500">
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
                 Priority
               </h2>
 
-              <p className="mt-1 capitalize text-gray-900">
+              <p className="mt-2 capitalize text-gray-200">
                 {task.priority}
               </p>
             </div>
 
-            <div>
-              <h2 className="text-sm font-medium text-gray-500">
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
                 Due Date
               </h2>
 
-              <p className="mt-1 text-gray-900">
+              <p className="mt-2 text-gray-200">
                 {task.dueDate
                   ? new Date(task.dueDate).toLocaleDateString()
                   : 'No due date'}
               </p>
             </div>
 
-            <div>
-              <h2 className="text-sm font-medium text-gray-500">
+            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
                 Assigned To
               </h2>
 
-              <p className="mt-1 text-gray-900">
+              <p className="mt-2 text-gray-200">
                 {task.assignedTo || 'Not assigned'}
               </p>
             </div>
@@ -266,26 +269,34 @@ function TaskDetails() {
           </div>
         </div>
       </Card>
-      {/* Task Comments Section */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Comments
-          </h2>
 
-          <span className="text-sm text-gray-500">
+      {/* Comments */}
+      <Card className="mt-6">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-white">
+              Comments
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Discuss this task with your team.
+            </p>
+          </div>
+
+          <span className="shrink-0 rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-400">
             {comments.length}{' '}
             {comments.length === 1 ? 'comment' : 'comments'}
           </span>
         </div>
-        {/* Add Comment Form */}
+
+        {/* Add Comment */}
         <form
           onSubmit={handleAddComment}
           className="mb-6"
         >
           <label
             htmlFor="comment"
-            className="mb-2 block text-sm font-medium text-gray-700"
+            className="mb-2 block text-sm font-medium text-gray-300"
           >
             Add a comment
           </label>
@@ -298,16 +309,16 @@ function TaskDetails() {
             }
             placeholder="Write a comment..."
             rows={3}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+            className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
 
-          <div className="mt-2 flex justify-end">
+          <div className="mt-3 flex justify-end">
             <button
               type="submit"
               disabled={
                 commentSubmitting || !commentContent.trim()
               }
-              className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {commentSubmitting ? 'Adding...' : 'Add Comment'}
             </button>
@@ -315,15 +326,15 @@ function TaskDetails() {
         </form>
 
         {commentError && (
-          <div className="mb-4 rounded-md bg-red-50 p-3">
-            <p className="text-sm text-red-600">
+          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-950/40 p-3">
+            <p className="text-sm text-red-300">
               {commentError}
             </p>
 
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-2 text-sm font-medium text-red-700 underline"
+              className="mt-2 text-sm font-medium text-red-400 underline hover:text-red-300"
             >
               Try again
             </button>
@@ -335,24 +346,29 @@ function TaskDetails() {
             Loading comments...
           </p>
         ) : comments.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            No comments yet.
-          </p>
+          <div className="rounded-lg border border-dashed border-gray-800 p-8 text-center">
+            <p className="text-sm font-medium text-gray-400">
+              No comments yet.
+            </p>
+
+            <p className="mt-1 text-xs text-gray-600">
+              Start the conversation about this task.
+            </p>
+          </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {comments.map((comment) => (
               <div
                 key={comment._id}
-                className="rounded-lg border border-gray-200 p-4"
+                className="rounded-xl border border-gray-800 bg-gray-950 p-4 transition-colors hover:border-gray-700"
               >
-
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-200">
                       {comment.author.name}
                     </p>
 
-                    <p className="text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-600">
                       {new Date(
                         comment.createdAt,
                       ).toLocaleString()}
@@ -362,26 +378,29 @@ function TaskDetails() {
                   {user?.id === comment.author._id && (
                     <button
                       type="button"
-                      disabled={deletingCommentId === comment._id}
+                      disabled={
+                        deletingCommentId === comment._id
+                      }
                       onClick={() =>
                         handleDeleteComment(comment._id)
                       }
-                      className="text-xs font-medium text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                      className="text-xs font-medium text-red-400 transition-colors hover:text-red-300 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {deletingCommentId === comment._id ? 'Deleting...' : 'Delete'}
+                      {deletingCommentId === comment._id
+                        ? 'Deleting...'
+                        : 'Delete'}
                     </button>
                   )}
                 </div>
 
-
-                <p className="mt-2 text-sm text-gray-700">
+                <p className="mt-3 text-sm leading-6 text-gray-400">
                   {comment.content}
                 </p>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

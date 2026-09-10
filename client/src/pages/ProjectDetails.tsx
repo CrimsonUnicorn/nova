@@ -75,7 +75,6 @@ function ProjectDetails() {
   const [progressLoading, setProgressLoading] = useState(true)
   const [progressError, setProgressError] = useState('')
 
-  {/* loads the project */ }
   useEffect(() => {
     async function loadProject() {
       if (!id) {
@@ -83,6 +82,7 @@ function ProjectDetails() {
         setLoading(false)
         return
       }
+
       try {
         const data = await apiRequest<{ project: Project }>(
           `/api/projects/${id}`,
@@ -102,7 +102,7 @@ function ProjectDetails() {
 
     void loadProject()
   }, [id])
-  {/* loads team members */ }
+
   useEffect(() => {
     if (!id) return
 
@@ -129,7 +129,7 @@ function ProjectDetails() {
 
     void loadMembers()
   }, [id])
-  {/* loads tasks */ }
+
   useEffect(() => {
     if (!id) return
 
@@ -221,6 +221,7 @@ function ProjectDetails() {
       setMemberLoading(false)
     }
   }
+
   async function handleRemoveMember(userId: string) {
     if (!id) return
 
@@ -265,7 +266,9 @@ function ProjectDetails() {
     }
   }
 
-  async function handleCreateTask(event: SyntheticEvent<HTMLFormElement>) {
+  async function handleCreateTask(
+    event: SyntheticEvent<HTMLFormElement>,
+  ) {
     event.preventDefault()
 
     if (!id) return
@@ -317,6 +320,7 @@ function ProjectDetails() {
       setCreatingTask(false)
     }
   }
+
   async function handleUpdateTask(
     taskId: string,
     data: {
@@ -394,28 +398,30 @@ function ProjectDetails() {
 
   if (loading) {
     return (
-      <p className="text-sm text-gray-500">
-        Loading project...
-      </p>
+      <div className="mx-auto max-w-7xl">
+        <p className="text-sm text-gray-500">
+          Loading project...
+        </p>
+      </div>
     )
   }
 
   if (error || !project) {
     return (
-      <div>
+      <div className="mx-auto max-w-7xl">
         <PageTitle
           title="Project Details"
           description="View project information."
         />
 
         <Card>
-          <p className="text-sm text-red-600">
+          <p className="text-sm text-red-400">
             {error || 'Project not found'}
           </p>
 
           <Link
             to="/projects"
-            className="mt-4 inline-block text-sm font-medium underline"
+            className="mt-4 inline-block text-sm font-medium text-gray-300 underline hover:text-white"
           >
             Back to Projects
           </Link>
@@ -425,7 +431,7 @@ function ProjectDetails() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-7xl">
       <PageTitle
         title={project.name}
         description="View project details and manage this project."
@@ -433,11 +439,11 @@ function ProjectDetails() {
 
       {/* Project information */}
       <Card>
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-lg font-semibold text-white">
           Description
         </h2>
 
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm leading-6 text-gray-400">
           {project.description || 'No description provided.'}
         </p>
 
@@ -454,12 +460,12 @@ function ProjectDetails() {
         </div>
 
         {error && (
-          <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
+          <p className="mt-4 rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
             {error}
           </p>
         )}
 
-        <div className="mt-6 flex gap-3">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Link to="/projects">
             <Button type="button">
               Back to Projects
@@ -468,7 +474,7 @@ function ProjectDetails() {
 
           <Button
             type="button"
-            variant='danger'
+            variant="danger"
             disabled={deleting}
             onClick={handleDelete}
           >
@@ -477,10 +483,11 @@ function ProjectDetails() {
         </div>
       </Card>
 
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center justify-between">
+      {/* Project progress */}
+      <div className="mt-6 rounded-xl border border-gray-800 bg-gray-900 p-6">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-white">
               Project Progress
             </h2>
 
@@ -490,30 +497,30 @@ function ProjectDetails() {
           </div>
 
           {!progressLoading && progress && (
-            <span className="text-2xl font-bold text-gray-900">
+            <span className="text-2xl font-semibold text-white">
               {progress.progress}%
             </span>
           )}
         </div>
-        {/* Progress bar and task count */}
+
         {progressLoading ? (
           <p className="mt-4 text-sm text-gray-500">
             Loading progress...
           </p>
         ) : progressError ? (
-          <p className="mt-4 text-sm text-red-600">
+          <p className="mt-4 rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
             {progressError}
           </p>
         ) : progress ? (
-          <div className="mt-4">
-            <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="mt-5">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-800">
               <div
-                className="h-full rounded-full bg-gray-900 transition-all"
+                className="h-full rounded-full bg-indigo-500 transition-all duration-500"
                 style={{ width: `${progress.progress}%` }}
               />
             </div>
 
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-gray-500">
               {progress.completedTasks} of {progress.totalTasks} tasks
               completed
             </p>
@@ -523,12 +530,12 @@ function ProjectDetails() {
 
       {/* Team members */}
       <Card className="mt-6">
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-white">
             Team Members
           </h2>
 
-          <p className="text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500">
             Add users to collaborate on this project.
           </p>
         </div>
@@ -542,7 +549,7 @@ function ProjectDetails() {
             value={userId}
             onChange={(event) => setUserId(event.target.value)}
             placeholder="Enter user ID"
-            className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-gray-300"
+            className="flex-1 rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
           />
 
           <Button type="submit" disabled={memberLoading}>
@@ -551,7 +558,7 @@ function ProjectDetails() {
         </form>
 
         {memberError && (
-          <p className="mt-3 text-sm text-red-600">
+          <p className="mt-3 rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
             {memberError}
           </p>
         )}
@@ -562,21 +569,23 @@ function ProjectDetails() {
               Loading team members...
             </p>
           ) : members.length === 0 ? (
-            <p className="text-sm text-gray-500">
-              No team members yet.
-            </p>
+            <div className="rounded-lg border border-dashed border-gray-800 p-6 text-center">
+              <p className="text-sm text-gray-400">
+                No team members yet.
+              </p>
+            </div>
           ) : (
             members.map((member) => (
               <div
                 key={member._id}
-                className="flex items-center justify-between rounded-md border p-3"
+                className="flex items-center justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950 p-4"
               >
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-200">
                     {member.name}
                   </p>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="mt-1 truncate text-sm text-gray-500">
                     {member.email}
                   </p>
                 </div>
@@ -594,24 +603,30 @@ function ProjectDetails() {
         </div>
       </Card>
 
-      {/* Create task form */}
-      <form
-        onSubmit={handleCreateTask}
-        className="mb-6 rounded-lg border border-gray-200 bg-gray-50 p-4"
-      >
-        <h3 className="mb-4 font-medium text-gray-900">
-          Create Task
-        </h3>
+      {/* Create task */}
+      <Card className="mt-6">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold text-white">
+            Create Task
+          </h2>
 
-        {createTaskError && (
-          <p className="mb-3 text-sm text-red-600">
-            {createTaskError}
+          <p className="mt-1 text-sm text-gray-500">
+            Add a new task to this project.
           </p>
-        )}
+        </div>
 
-        <div className="space-y-4">
+        <form
+          onSubmit={handleCreateTask}
+          className="space-y-5"
+        >
+          {createTaskError && (
+            <p className="rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
+              {createTaskError}
+            </p>
+          )}
+
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-sm font-medium text-gray-300">
               Title
             </label>
 
@@ -621,27 +636,29 @@ function ProjectDetails() {
               onChange={(event) => setTaskTitle(event.target.value)}
               placeholder="Enter task title"
               required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-sm font-medium text-gray-300">
               Description
             </label>
 
             <textarea
               value={taskDescription}
-              onChange={(event) => setTaskDescription(event.target.value)}
+              onChange={(event) =>
+                setTaskDescription(event.target.value)
+              }
               placeholder="Enter task description"
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+              className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-2 block text-sm font-medium text-gray-300">
                 Priority
               </label>
 
@@ -649,10 +666,13 @@ function ProjectDetails() {
                 value={taskPriority}
                 onChange={(event) =>
                   setTaskPriority(
-                    event.target.value as 'low' | 'medium' | 'high',
+                    event.target.value as
+                    | 'low'
+                    | 'medium'
+                    | 'high',
                   )
                 }
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -661,7 +681,7 @@ function ProjectDetails() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-2 block text-sm font-medium text-gray-300">
                 Due Date
               </label>
 
@@ -669,67 +689,73 @@ function ProjectDetails() {
                 type="date"
                 value={taskDueDate}
                 onChange={(event) => setTaskDueDate(event.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
               />
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={creatingTask}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
+          <Button type="submit" disabled={creatingTask}>
             {creatingTask ? 'Creating...' : 'Create Task'}
-          </button>
-        </div>
-      </form>
+          </Button>
+        </form>
+      </Card>
 
       {/* Task statistics */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
           <p className="text-sm text-gray-500">Total Tasks</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">
+
+          <p className="mt-2 text-2xl font-semibold text-white">
             {totalTasks}
           </p>
-        </div>
+        </Card>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <Card>
           <p className="text-sm text-gray-500">To Do</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">
+
+          <p className="mt-2 text-2xl font-semibold text-white">
             {todoTasks}
           </p>
-        </div>
+        </Card>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <Card>
           <p className="text-sm text-gray-500">In Progress</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">
+
+          <p className="mt-2 text-2xl font-semibold text-indigo-400">
             {inProgressTasks}
           </p>
-        </div>
+        </Card>
 
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <Card>
           <p className="text-sm text-gray-500">Completed</p>
-          <p className="mt-1 text-2xl font-semibold text-gray-900">
+
+          <p className="mt-2 text-2xl font-semibold text-emerald-400">
             {completedTasks}
           </p>
-        </div>
+        </Card>
       </div>
 
       {/* Tasks list */}
-      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Tasks
-          </h2>
+      <Card className="mt-6">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-white">
+              Tasks
+            </h2>
 
-          <span className="text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500">
+              Manage tasks and track their progress.
+            </p>
+          </div>
+
+          <span className="shrink-0 rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-400">
             {tasks.length} {tasks.length === 1 ? 'task' : 'tasks'}
           </span>
         </div>
 
         {taskError && (
-          <div className="mb-4 rounded-md bg-red-50 p-3">
-            <p className="text-sm text-red-600">
+          <div className="mb-4 rounded-lg border border-red-900/50 bg-red-950/40 p-3">
+            <p className="text-sm text-red-300">
               {taskError}
             </p>
 
@@ -741,7 +767,7 @@ function ProjectDetails() {
                 }
               }}
               disabled={tasksLoading}
-              className="mt-2 text-sm font-medium text-red-700 underline disabled:opacity-50"
+              className="mt-2 text-sm font-medium text-red-400 underline transition-colors hover:text-red-300 disabled:opacity-50"
             >
               {tasksLoading ? 'Retrying...' : 'Try again'}
             </button>
@@ -753,26 +779,32 @@ function ProjectDetails() {
             Loading tasks...
           </p>
         ) : tasks.length === 0 && !taskError ? (
-          <p className="text-sm text-gray-500">
-            No tasks yet.
-          </p>
+          <div className="rounded-lg border border-dashed border-gray-800 p-8 text-center">
+            <p className="text-sm font-medium text-gray-400">
+              No tasks yet.
+            </p>
+
+            <p className="mt-1 text-xs text-gray-600">
+              Create a task above to start working on this project.
+            </p>
+          </div>
         ) : (
           <div className="space-y-3">
             {tasks.map((task) => (
               <div
                 key={task._id}
-                className="rounded-lg border border-gray-200 p-4"
+                className="rounded-xl border border-gray-800 bg-gray-950 p-4 transition-colors hover:border-gray-700"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0">
                     <Link to={`/tasks/${task._id}`}>
-                      <h3 className="font-medium text-gray-900 hover:underline">
+                      <h3 className="font-medium text-gray-200 transition-colors hover:text-white">
                         {task.title}
                       </h3>
                     </Link>
 
                     {task.description && (
-                      <p className="mt-1 text-sm text-gray-600">
+                      <p className="mt-2 text-sm leading-6 text-gray-500">
                         {task.description}
                       </p>
                     )}
@@ -789,7 +821,7 @@ function ProjectDetails() {
                           | 'completed',
                       })
                     }
-                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                    className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs text-gray-300 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                   >
                     <option value="todo">Todo</option>
                     <option value="in-progress">In Progress</option>
@@ -797,7 +829,7 @@ function ProjectDetails() {
                   </select>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-4">
+                <div className="mt-4 flex flex-wrap items-center gap-3">
                   <select
                     value={task.priority}
                     disabled={updatingTaskId === task._id}
@@ -809,7 +841,7 @@ function ProjectDetails() {
                           | 'high',
                       })
                     }
-                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                    className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs text-gray-300 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -817,7 +849,7 @@ function ProjectDetails() {
                   </select>
 
                   {task.dueDate && (
-                    <span className="text-xs text-gray-500">
+                    <span className="rounded-lg bg-gray-900 px-3 py-2 text-xs text-gray-500">
                       Due: {new Date(task.dueDate).toLocaleDateString()}
                     </span>
                   )}
@@ -826,9 +858,12 @@ function ProjectDetails() {
                     value={task.assignedTo || ''}
                     disabled={assigningTaskId === task._id}
                     onChange={(event) =>
-                      void handleAssignTask(task._id, event.target.value)
+                      void handleAssignTask(
+                        task._id,
+                        event.target.value,
+                      )
                     }
-                    className="rounded-md border border-gray-300 px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-gray-300"
+                    className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-xs text-gray-300 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                   >
                     <option value="">Assign to...</option>
 
@@ -841,13 +876,13 @@ function ProjectDetails() {
                 </div>
 
                 {updateTaskError?.taskId === task._id && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-3 rounded-lg border border-red-900/50 bg-red-950/40 p-2 text-xs text-red-300">
                     {updateTaskError.message}
                   </p>
                 )}
 
                 {assignTaskError?.taskId === task._id && (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-3 rounded-lg border border-red-900/50 bg-red-950/40 p-2 text-xs text-red-300">
                     {assignTaskError.message}
                   </p>
                 )}
@@ -855,8 +890,8 @@ function ProjectDetails() {
             ))}
           </div>
         )}
-      </div>
-    </div >
+      </Card>
+    </div>
   )
 }
 

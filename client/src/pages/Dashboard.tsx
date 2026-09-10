@@ -81,92 +81,142 @@ function Dashboard() {
   )
 
   return (
-    <div>
+    <div className="mx-auto max-w-7xl">
       <PageTitle
         title="Dashboard"
         description="Overview of your team's productivity and projects."
       />
 
       {error && (
-        <div className="mb-6 rounded-md bg-red-50 p-3">
-          <p className="text-sm text-red-600">
-            {error}
-          </p>
+        <div className="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 p-4">
+          <p className="text-sm text-red-300">{error}</p>
 
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-2 text-sm font-medium text-red-700 underline"
+            className="mt-2 text-sm font-medium text-red-400 underline transition-colors hover:text-red-300"
           >
             Try again
           </button>
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <p className="text-sm text-gray-500">Total Projects</p>
-          <p className="mt-2 text-3xl font-bold">
-            {loading ? '...' : totalProjects}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Total Projects
+              </p>
+
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+                {loading ? '...' : totalProjects}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+              Projects
+            </div>
+          </div>
         </Card>
 
         <Card>
-          <p className="text-sm text-gray-500">Total Tasks</p>
-          <p className="mt-2 text-3xl font-bold">
-            {loading ? '...' : totalTasks}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Total Tasks
+              </p>
+
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+                {loading ? '...' : totalTasks}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+              Tasks
+            </div>
+          </div>
         </Card>
 
         <Card>
-          <p className="text-sm text-gray-500">Completed Tasks</p>
-          <p className="mt-2 text-3xl font-bold">
-            {loading ? '...' : completedTasks}
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Completed
+              </p>
+
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+                {loading ? '...' : completedTasks}
+              </p>
+            </div>
+
+            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+              Done
+            </div>
+          </div>
         </Card>
       </div>
 
       <div className="mt-6">
         <Card>
-          <h2 className="text-lg font-semibold">
-            Project Progress
-          </h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-white">
+                Project Progress
+              </h2>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Track how your projects are moving forward.
+              </p>
+            </div>
+          </div>
 
           {loading ? (
-            <p className="mt-4 text-sm text-gray-500">
+            <p className="mt-6 text-sm text-gray-500">
               Loading projects...
             </p>
           ) : projects.length === 0 ? (
-            <p className="mt-4 text-sm text-gray-500">
-              No projects yet.
-            </p>
-          ) : (
-            <div className="mt-4 space-y-4">
-              {projects.map((project) => (
-                <div key={project._id}>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">
-                      {project.name}
-                    </p>
+            <div className="mt-6 rounded-lg border border-dashed border-gray-800 p-8 text-center">
+              <p className="text-sm text-gray-400">
+                No projects yet.
+              </p>
 
-                    <p className="text-sm text-gray-500">
+              <p className="mt-1 text-xs text-gray-600">
+                Create your first project to start tracking progress.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6 divide-y divide-gray-800">
+              {projects.map((project) => (
+                <div
+                  key={project._id}
+                  className="py-5 first:pt-0 last:pb-0"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-gray-200">
+                        {project.name}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-600">
+                        {project.completedTasks} of{' '}
+                        {project.totalTasks} tasks completed
+                      </p>
+                    </div>
+
+                    <p className="shrink-0 text-sm font-medium text-gray-400">
                       {project.progress}%
                     </p>
                   </div>
 
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-800">
                     <div
-                      className="h-full rounded-full bg-gray-900 transition-all"
+                      className="h-full rounded-full bg-indigo-500 transition-all duration-500"
                       style={{
                         width: `${project.progress}%`,
                       }}
                     />
                   </div>
-
-                  <p className="mt-1 text-xs text-gray-500">
-                    {project.completedTasks} of {project.totalTasks}{' '}
-                    tasks completed
-                  </p>
                 </div>
               ))}
             </div>

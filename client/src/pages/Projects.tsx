@@ -101,25 +101,31 @@ function Projects() {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-7xl">
       <PageTitle
         title="Projects"
         description="Manage your projects and track their progress."
       />
 
       <Card>
-        <h2 className="text-lg font-semibold text-gray-900">
-          Create Project
-        </h2>
+        <div>
+          <h2 className="text-lg font-semibold text-white">
+            Create Project
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            Start a new workspace for your team.
+          </p>
+        </div>
 
         <form
           onSubmit={handleCreateProject}
-          className="mt-4 space-y-4"
+          className="mt-6 space-y-5"
         >
           <div>
             <label
               htmlFor="project-name"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-2 block text-sm font-medium text-gray-300"
             >
               Name
             </label>
@@ -129,15 +135,15 @@ function Projects() {
               type="text"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Project name"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              placeholder="e.g. Website Redesign"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
             />
           </div>
 
           <div>
             <label
               htmlFor="project-description"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-2 block text-sm font-medium text-gray-300"
             >
               Description
             </label>
@@ -148,16 +154,20 @@ function Projects() {
               onChange={(event) =>
                 setDescription(event.target.value)
               }
-              placeholder="Project description"
+              placeholder="What is this project about?"
               rows={3}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
             />
           </div>
+
           {createError && (
-            <p className="text-sm text-red-600">
-              {createError}
-            </p>
+            <div className="rounded-lg border border-red-900/50 bg-red-950/40 px-3 py-2.5">
+              <p className="text-sm text-red-300">
+                {createError}
+              </p>
+            </div>
           )}
+
           <Button type="submit" disabled={creating}>
             {creating ? 'Creating...' : 'Create Project'}
           </Button>
@@ -165,10 +175,8 @@ function Projects() {
       </Card>
 
       {error && (
-        <div className="mt-4 rounded-md bg-red-50 p-3">
-          <p className="text-sm text-red-600">
-            {error}
-          </p>
+        <div className="mt-4 rounded-xl border border-red-900/50 bg-red-950/40 p-4">
+          <p className="text-sm text-red-300">{error}</p>
 
           <button
             type="button"
@@ -177,25 +185,44 @@ function Projects() {
               void loadProjects()
             }}
             disabled={loading}
-            className="mt-2 text-sm font-medium text-red-700 underline disabled:opacity-50"
+            className="mt-2 text-sm font-medium text-red-400 underline transition-colors hover:text-red-300 disabled:opacity-50"
           >
             {loading ? 'Retrying...' : 'Try again'}
           </button>
         </div>
       )}
 
-      <div className="mt-6">
-        {loading && (
-          <p className="text-sm text-gray-500">
-            Loading projects...
+      <div className="mt-8">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-white">
+            Your Projects
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-500">
+            {projects.length} project
+            {projects.length === 1 ? '' : 's'} in your workspace
           </p>
+        </div>
+
+        {loading && (
+          <Card>
+            <p className="text-sm text-gray-500">
+              Loading projects...
+            </p>
+          </Card>
         )}
 
         {!loading && projects.length === 0 && (
           <Card>
-            <p className="text-sm text-gray-500">
-              No projects yet.
-            </p>
+            <div className="py-6 text-center">
+              <p className="text-sm font-medium text-gray-300">
+                No projects yet
+              </p>
+
+              <p className="mt-1 text-sm text-gray-600">
+                Create your first project above to get started.
+              </p>
+            </div>
           </Card>
         )}
 
@@ -205,19 +232,36 @@ function Projects() {
               <Card key={project._id}>
                 <Link
                   to={`/projects/${project._id}`}
-                  className="text-lg font-semibold text-gray-900 hover:underline"
+                  className="group block"
                 >
-                  {project.name}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-semibold text-gray-200 transition-colors group-hover:text-white">
+                        {project.name}
+                      </h3>
+
+                      <div className="mt-2 h-1 w-10 rounded-full bg-indigo-500" />
+                    </div>
+
+                    <span className="text-gray-600 transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
+                  </div>
+
+                  <p className="mt-4 line-clamp-3 text-sm leading-6 text-gray-500">
+                    {project.description ||
+                      'No description provided.'}
+                  </p>
+
+                  <div className="mt-6 border-t border-gray-800 pt-4">
+                    <p className="text-xs text-gray-600">
+                      Created{' '}
+                      {new Date(
+                        project.createdAt,
+                      ).toLocaleDateString()}
+                    </p>
+                  </div>
                 </Link>
-
-                <p className="mt-2 text-sm text-gray-600">
-                  {project.description || 'No description provided.'}
-                </p>
-
-                <p className="mt-4 text-xs text-gray-400">
-                  Created{' '}
-                  {new Date(project.createdAt).toLocaleDateString()}
-                </p>
               </Card>
             ))}
           </div>
