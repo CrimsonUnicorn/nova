@@ -5,6 +5,7 @@ import { connectDatabase } from './config/database.js'
 import authRoutes from './routes/authRoutes.js'
 import healthRoutes from './routes/healthRoutes.js'
 import projectRoutes from "./routes/projectRoutes.js";
+import taskRoutes from "./routes/taskRoutes.js";
 
 
 const app = express()
@@ -22,6 +23,7 @@ app.use(express.json())
 app.use('/api/health', healthRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/projects', projectRoutes)
+app.use('/api/tasks', taskRoutes)
 
 app.get("/", (req, res) => {
   res.send("NOVA API is working!");

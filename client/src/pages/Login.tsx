@@ -22,6 +22,7 @@ function Login() {
       const data = await loginUser(email, password)
 
       localStorage.setItem('nova_token', data.token)
+      console.log('NAVIGATING TO DASHBOARD')
 
       navigate('/dashboard')
     } catch (error) {

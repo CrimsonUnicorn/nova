@@ -16,6 +16,7 @@ import { logout as clearAuth } from '../services/auth'
 interface AuthContextValue {
   user: AuthUser | null
   loading: boolean
+  login: (user: AuthUser, token: string) => void
   logout: () => void
 }
 
@@ -53,6 +54,10 @@ export function AuthProvider({
         setLoading(false)
       })
   }, [])
+  function login(user: AuthUser, token: string) {
+    localStorage.setItem('nova_token', token)
+    setUser(user)
+  }
 
   function logout() {
     clearAuth()
@@ -64,6 +69,7 @@ export function AuthProvider({
       value={{
         user,
         loading,
+        login,
         logout,
       }}
     >
