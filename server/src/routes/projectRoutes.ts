@@ -1,15 +1,17 @@
 import { Router } from 'express'
 
 import { authMiddleware } from '../middleware/authMiddleware.js'
-import { 
-    createProject,
-    getProjects, 
-    getProjectById, 
-    updateProject, 
-    deleteProject, 
-    addProjectMember,
-    getProjectMembers,
-    removeProjectMember, } from '../controllers/projectController.js'
+import {
+  createProject,
+  getProjects,
+  getProjectById,
+  updateProject,
+  deleteProject,
+  addProjectMember,
+  getProjectMembers,
+  removeProjectMember,
+} from '../controllers/projectController.js'
+import { getProjectProgress } from '../controllers/projectProgressController.js'
 
 const router = Router()
 
@@ -25,6 +27,11 @@ router.delete(
   '/:id/members/:userId',
   authMiddleware,
   removeProjectMember,
+)
+router.get(
+  '/projects/:projectId/progress',
+  authMiddleware,
+  getProjectProgress,
 )
 
 export default router
