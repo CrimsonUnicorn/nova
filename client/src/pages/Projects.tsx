@@ -21,6 +21,7 @@ function Projects() {
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
+  const [createError, setCreateError] = useState('')
 
   async function loadProjects() {
     try {
@@ -51,14 +52,21 @@ function Projects() {
   ) {
     event.preventDefault()
 
-    if (!name.trim()) {
+    const trimmedName = name.trim()
+
+    if (!trimmedName) {
       setError('Project name is required')
+      return
+    }
+
+    if (trimmedName.length > 100) {
+      setError('Project name must be 100 characters or less')
       return
     }
 
     try {
       setCreating(true)
-      setError('')
+      setCreateError('')
 
       const data = await apiRequest<{ project: Project }>(
         '/api/projects',
@@ -68,7 +76,7 @@ function Projects() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: name.trim(),
+            name: trimmedName,
             description: description.trim(),
           }),
         },
@@ -82,7 +90,7 @@ function Projects() {
       setName('')
       setDescription('')
     } catch (err) {
-      setError(
+      setCreateError(
         err instanceof Error
           ? err.message
           : 'Failed to create project',
@@ -145,7 +153,11 @@ function Projects() {
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
             />
           </div>
-
+          {createError && (
+            <p className="text-sm text-red-600">
+              {createError}
+            </p>
+          )}
           <Button type="submit" disabled={creating}>
             {creating ? 'Creating...' : 'Create Project'}
           </Button>
@@ -153,9 +165,23 @@ function Projects() {
       </Card>
 
       {error && (
-        <p className="mt-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </p>
+        <div className="mt-4 rounded-md bg-red-50 p-3">
+          <p className="text-sm text-red-600">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setLoading(true)
+              void loadProjects()
+            }}
+            disabled={loading}
+            className="mt-2 text-sm font-medium text-red-700 underline disabled:opacity-50"
+          >
+            {loading ? 'Retrying...' : 'Try again'}
+          </button>
+        </div>
       )}
 
       <div className="mt-6">

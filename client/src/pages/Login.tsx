@@ -1,4 +1,4 @@
-import {  useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { loginUser } from '../services/authService'
@@ -15,14 +15,26 @@ function Login() {
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
 
+
+    const trimmedEmail = email.trim()
+
+    if (!trimmedEmail) {
+      setError('Email is required')
+      return
+    }
+
+    if (!password) {
+      setError('Password is required')
+      return
+    }
+
     setError('')
     setLoading(true)
 
     try {
-      const data = await loginUser(email, password)
+      const data = await loginUser(trimmedEmail, password)
 
       localStorage.setItem('nova_token', data.token)
-      console.log('NAVIGATING TO DASHBOARD')
 
       navigate('/dashboard')
     } catch (error) {
@@ -88,9 +100,11 @@ function Login() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">
-              {error}
-            </p>
+            <div className="rounded-md bg-red-50 p-3">
+              <p className="text-sm text-red-600">
+                {error}
+              </p>
+            </div>
           )}
 
           <button

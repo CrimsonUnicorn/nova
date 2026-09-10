@@ -46,9 +46,12 @@ function ProjectDetails() {
   const [userId, setUserId] = useState('')
   const [memberError, setMemberError] = useState('')
   const [memberLoading, setMemberLoading] = useState(false)
+  const [membersLoading, setMembersLoading] = useState(true)
 
   const [tasks, setTasks] = useState<Task[]>([])
   const [taskError, setTaskError] = useState('')
+  const [tasksLoading, setTasksLoading] = useState(false)
+
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDescription, setTaskDescription] = useState('')
   const [taskPriority, setTaskPriority] = useState<
@@ -58,9 +61,15 @@ function ProjectDetails() {
   const [creatingTask, setCreatingTask] = useState(false)
   const [createTaskError, setCreateTaskError] = useState('')
   const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null)
-  const [updateTaskError, setUpdateTaskError] = useState('')
+  const [updateTaskError, setUpdateTaskError] = useState<{
+    taskId: string
+    message: string
+  } | null>(null)
   const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null)
-  const [assignTaskError, setAssignTaskError] = useState('')
+  const [assignTaskError, setAssignTaskError] = useState<{
+    taskId: string
+    message: string
+  } | null>(null)
 
   const [progress, setProgress] = useState<ProjectProgress | null>(null)
   const [progressLoading, setProgressLoading] = useState(true)
@@ -74,7 +83,6 @@ function ProjectDetails() {
         setLoading(false)
         return
       }
-
       try {
         const data = await apiRequest<{ project: Project }>(
           `/api/projects/${id}`,
@@ -102,7 +110,11 @@ function ProjectDetails() {
 
     async function loadMembers() {
       try {
+        setMembersLoading(true)
+        setMemberError('')
+
         const data = await getProjectMembers(projectId)
+
         setMembers(data)
       } catch (err) {
         setMemberError(
@@ -110,6 +122,8 @@ function ProjectDetails() {
             ? err.message
             : 'Failed to load project members',
         )
+      } finally {
+        setMembersLoading(false)
       }
     }
 
@@ -234,6 +248,7 @@ function ProjectDetails() {
 
   async function refreshTasks(projectId: string) {
     try {
+      setTasksLoading(true)
       setTaskError('')
 
       const updatedTasks = await getProjectTasks(projectId)
@@ -245,6 +260,8 @@ function ProjectDetails() {
           ? err.message
           : 'Failed to load project tasks',
       )
+    } finally {
+      setTasksLoading(false)
     }
   }
 
@@ -253,12 +270,31 @@ function ProjectDetails() {
 
     if (!id) return
 
+    const trimmedTitle = taskTitle.trim()
+
+    if (!trimmedTitle) {
+      setCreateTaskError('Task title is required.')
+      return
+    }
+
+    if (taskDueDate) {
+      const selectedDate = new Date(taskDueDate)
+      const today = new Date()
+
+      today.setHours(0, 0, 0, 0)
+
+      if (selectedDate < today) {
+        setCreateTaskError('Due date cannot be in the past.')
+        return
+      }
+    }
+
     try {
       setCreatingTask(true)
       setCreateTaskError('')
 
       await createTask({
-        title: taskTitle,
+        title: trimmedTitle,
         description: taskDescription || undefined,
         priority: taskPriority,
         project: id,
@@ -281,7 +317,6 @@ function ProjectDetails() {
       setCreatingTask(false)
     }
   }
-
   async function handleUpdateTask(
     taskId: string,
     data: {
@@ -291,7 +326,7 @@ function ProjectDetails() {
   ) {
     try {
       setUpdatingTaskId(taskId)
-      setUpdateTaskError('')
+      setUpdateTaskError(null)
 
       const updatedTask = await updateTask(taskId, data)
 
@@ -301,11 +336,13 @@ function ProjectDetails() {
         ),
       )
     } catch (err) {
-      setUpdateTaskError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to update task',
-      )
+      setUpdateTaskError({
+        taskId,
+        message:
+          err instanceof Error
+            ? err.message
+            : 'Failed to update task',
+      })
     } finally {
       setUpdatingTaskId(null)
     }
@@ -319,7 +356,7 @@ function ProjectDetails() {
 
     try {
       setAssigningTaskId(taskId)
-      setAssignTaskError('')
+      setAssignTaskError(null)
 
       const updatedTask = await assignTask(taskId, memberId)
 
@@ -329,11 +366,13 @@ function ProjectDetails() {
         ),
       )
     } catch (err) {
-      setAssignTaskError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to assign task',
-      )
+      setAssignTaskError({
+        taskId,
+        message:
+          err instanceof Error
+            ? err.message
+            : 'Failed to assign task',
+      })
     } finally {
       setAssigningTaskId(null)
     }
@@ -429,6 +468,7 @@ function ProjectDetails() {
 
           <Button
             type="button"
+            variant='danger'
             disabled={deleting}
             onClick={handleDelete}
           >
@@ -517,7 +557,11 @@ function ProjectDetails() {
         )}
 
         <div className="mt-6 space-y-3">
-          {members.length === 0 ? (
+          {membersLoading ? (
+            <p className="text-sm text-gray-500">
+              Loading team members...
+            </p>
+          ) : members.length === 0 ? (
             <p className="text-sm text-gray-500">
               No team members yet.
             </p>
@@ -684,22 +728,31 @@ function ProjectDetails() {
         </div>
 
         {taskError && (
-          <p className="mb-4 text-sm text-red-600">
-            {taskError}
-          </p>
-        )}
-        {updateTaskError && (
-          <p className="mb-4 text-sm text-red-600">
-            {updateTaskError}
-          </p>
-        )}
-        {assignTaskError && (
-          <p className="mb-4 text-sm text-red-600">
-            {assignTaskError}
-          </p>
+          <div className="mb-4 rounded-md bg-red-50 p-3">
+            <p className="text-sm text-red-600">
+              {taskError}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (id) {
+                  void refreshTasks(id)
+                }
+              }}
+              disabled={tasksLoading}
+              className="mt-2 text-sm font-medium text-red-700 underline disabled:opacity-50"
+            >
+              {tasksLoading ? 'Retrying...' : 'Try again'}
+            </button>
+          </div>
         )}
 
-        {tasks.length === 0 && !taskError ? (
+        {tasksLoading ? (
+          <p className="text-sm text-gray-500">
+            Loading tasks...
+          </p>
+        ) : tasks.length === 0 && !taskError ? (
           <p className="text-sm text-gray-500">
             No tasks yet.
           </p>
@@ -791,12 +844,24 @@ function ProjectDetails() {
                     ))}
                   </select>
                 </div>
+
+                {updateTaskError?.taskId === task._id && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {updateTaskError.message}
+                  </p>
+                )}
+
+                {assignTaskError?.taskId === task._id && (
+                  <p className="mt-2 text-xs text-red-600">
+                    {assignTaskError.message}
+                  </p>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </div >
   )
 }
 

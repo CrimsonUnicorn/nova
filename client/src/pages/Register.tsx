@@ -1,4 +1,4 @@
-import {  useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { registerUser } from '../services/authService'
@@ -13,14 +13,32 @@ function Register() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(event:React.SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
+
+    if (!trimmedName) {
+      setError('Name is required')
+      return
+    }
+
+    if (!trimmedEmail) {
+      setError('Email is required')
+      return
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
 
     setError('')
     setLoading(true)
 
     try {
-      await registerUser(name, email, password)
+      await registerUser(trimmedName, trimmedEmail, password)
 
       navigate('/login')
     } catch (error) {
@@ -106,10 +124,12 @@ function Register() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-600">
-              {error}
-            </p>
-          )}
+  <div className="rounded-md bg-red-50 p-3">
+    <p className="text-sm text-red-600">
+      {error}
+    </p>
+  </div>
+)}
 
           <button
             type="submit"

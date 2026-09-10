@@ -33,13 +33,22 @@ function Dashboard() {
 
         const projectsWithProgress = await Promise.all(
           data.projects.map(async (project) => {
-            const progress = await getProjectProgress(project._id)
+            try {
+              const progress = await getProjectProgress(project._id)
 
-            return {
-              ...project,
-              progress: progress.progress,
-              totalTasks: progress.totalTasks,
-              completedTasks: progress.completedTasks,
+              return {
+                ...project,
+                progress: progress.progress,
+                totalTasks: progress.totalTasks,
+                completedTasks: progress.completedTasks,
+              }
+            } catch {
+              return {
+                ...project,
+                progress: 0,
+                totalTasks: 0,
+                completedTasks: 0,
+              }
             }
           }),
         )
@@ -79,9 +88,19 @@ function Dashboard() {
       />
 
       {error && (
-        <p className="mb-6 rounded-md bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </p>
+        <div className="mb-6 rounded-md bg-red-50 p-3">
+          <p className="text-sm text-red-600">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="mt-2 text-sm font-medium text-red-700 underline"
+          >
+            Try again
+          </button>
+        </div>
       )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

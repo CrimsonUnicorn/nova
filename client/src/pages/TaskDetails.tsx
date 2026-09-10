@@ -25,6 +25,7 @@ function TaskDetails() {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [commentContent, setCommentContent] = useState('')
   const [commentSubmitting, setCommentSubmitting] = useState(false)
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null)
 
   useEffect(() => {
     if (!id) {
@@ -85,7 +86,12 @@ function TaskDetails() {
   ) {
     event.preventDefault()
 
-    if (!id || !commentContent.trim()) {
+    if (!id) return
+
+    const trimmedComment = commentContent.trim()
+
+    if (!trimmedComment) {
+      setCommentError('Comment cannot be empty.')
       return
     }
 
@@ -95,7 +101,7 @@ function TaskDetails() {
 
       const newComment = await createComment(
         id,
-        commentContent.trim(),
+        trimmedComment,
       )
 
       setComments((currentComments) => [
@@ -122,6 +128,7 @@ function TaskDetails() {
     if (!confirmed) return
 
     try {
+      setDeletingCommentId(commentId)
       setCommentError('')
 
       await deleteComment(commentId)
@@ -137,6 +144,8 @@ function TaskDetails() {
           ? err.message
           : 'Failed to delete comment',
       )
+    } finally {
+      setDeletingCommentId(null)
     }
   }
 
@@ -161,6 +170,16 @@ function TaskDetails() {
           <p className="text-sm text-red-600">
             {error || 'Task not found'}
           </p>
+
+          {error && (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-3 text-sm font-medium text-red-700 underline"
+            >
+              Try again
+            </button>
+          )}
 
           <Link
             to="/projects"
@@ -296,9 +315,19 @@ function TaskDetails() {
         </form>
 
         {commentError && (
-          <p className="mb-4 text-sm text-red-600">
-            {commentError}
-          </p>
+          <div className="mb-4 rounded-md bg-red-50 p-3">
+            <p className="text-sm text-red-600">
+              {commentError}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-2 text-sm font-medium text-red-700 underline"
+            >
+              Try again
+            </button>
+          </div>
         )}
 
         {commentsLoading ? (
@@ -333,12 +362,13 @@ function TaskDetails() {
                   {user?.id === comment.author._id && (
                     <button
                       type="button"
+                      disabled={deletingCommentId === comment._id}
                       onClick={() =>
                         handleDeleteComment(comment._id)
                       }
-                      className="text-xs font-medium text-red-600 hover:underline"
+                      className="text-xs font-medium text-red-600 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      Delete
+                      {deletingCommentId === comment._id ? 'Deleting...' : 'Delete'}
                     </button>
                   )}
                 </div>
