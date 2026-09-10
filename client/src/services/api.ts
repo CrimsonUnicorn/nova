@@ -5,29 +5,50 @@ export async function apiRequest<T>(
   options?: RequestInit,
 ): Promise<T> {
   const token = localStorage.getItem('nova_token')
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-       ...(token
-        ? {
+
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token
+          ? {
             Authorization: `Bearer ${token}`,
           }
-        : {}),
+          : {}),
+        ...options?.headers,
+      },
+    })
 
-      ...options?.headers,
-    },
-  })
+    let data: { message?: string }
 
-  const data = await response.json()
+    try {
+      data = await response.json()
+    } catch {
+      throw new Error(
+        response.ok
+          ? 'Invalid response from server'
+          : `Server error: ${response.status}`,
+      )
+    }
 
-  if (!response.ok) {
-    throw new Error(data.message || `API request failed: ${response.status}`)
+    if (!response.ok) {
+      throw new Error(
+        data.message || `API request failed: ${response.status}`,
+      )
+    }
+
+    return data as T
+  } catch (err) {
+    if (err instanceof TypeError) {
+      throw new Error(
+        'Unable to connect to the server. Please try again.',
+      )
+    }
+
+    throw err
   }
-
-  return data as T
 }
-
 export interface HealthResponse {
   status: string
   message: string

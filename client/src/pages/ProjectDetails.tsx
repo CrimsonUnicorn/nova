@@ -75,7 +75,7 @@ function ProjectDetails() {
   const [progressLoading, setProgressLoading] = useState(true)
   const [progressError, setProgressError] = useState('')
 
-  { /loads the project/ }
+  {/* loads the project */ }
   useEffect(() => {
     async function loadProject() {
       if (!id) {
@@ -102,7 +102,7 @@ function ProjectDetails() {
 
     void loadProject()
   }, [id])
-  { /loads team members/ }
+  {/* loads team members */ }
   useEffect(() => {
     if (!id) return
 
@@ -129,7 +129,7 @@ function ProjectDetails() {
 
     void loadMembers()
   }, [id])
-  { /loads tasks/ }
+  {/* loads tasks */ }
   useEffect(() => {
     if (!id) return
 
@@ -763,11 +763,6 @@ function ProjectDetails() {
                 key={task._id}
                 className="rounded-lg border border-gray-200 p-4"
               >
-                <Link to={`/tasks/${task._id}`}>
-                  <h3 className="font-medium text-gray-900 hover:underline">
-                    {task.title}
-                  </h3>
-                </Link>
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <Link to={`/tasks/${task._id}`}>
