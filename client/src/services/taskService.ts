@@ -45,7 +45,7 @@ export async function getProjectTasks(
   projectId: string,
 ): Promise<Task[]> {
   const response = await apiRequest<{ tasks: Task[] }>(
-    `/api/tasks/project/${projectId}`,
+    `/api/tasks/projects/${projectId}`,
   )
 
   return response.tasks

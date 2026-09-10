@@ -29,7 +29,7 @@ router.delete(
   removeProjectMember,
 )
 router.get(
-  '/projects/:projectId/progress',
+  '/:projectId/progress',
   authMiddleware,
   getProjectProgress,
 )

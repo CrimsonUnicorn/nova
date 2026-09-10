@@ -19,6 +19,10 @@ import {
   updateTask,
   type Task,
 } from '../services/taskService'
+import {
+  getProjectProgress,
+  type ProjectProgress,
+} from '../services/projectProgressService'
 
 interface Project {
   _id: string
@@ -57,6 +61,10 @@ function ProjectDetails() {
   const [updateTaskError, setUpdateTaskError] = useState('')
   const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null)
   const [assignTaskError, setAssignTaskError] = useState('')
+
+  const [progress, setProgress] = useState<ProjectProgress | null>(null)
+  const [progressLoading, setProgressLoading] = useState(true)
+  const [progressError, setProgressError] = useState('')
 
   { /loads the project/ }
   useEffect(() => {
@@ -112,6 +120,36 @@ function ProjectDetails() {
     if (!id) return
 
     void refreshTasks(id)
+  }, [id])
+
+  useEffect(() => {
+    if (!id) {
+      setProgressLoading(false)
+      return
+    }
+
+    const projectId = id
+
+    async function loadProgress() {
+      try {
+        setProgressLoading(true)
+        setProgressError('')
+
+        const data = await getProjectProgress(projectId)
+
+        setProgress(data)
+      } catch (err) {
+        setProgressError(
+          err instanceof Error
+            ? err.message
+            : 'Failed to load project progress',
+        )
+      } finally {
+        setProgressLoading(false)
+      }
+    }
+
+    void loadProgress()
   }, [id])
 
   async function handleDelete() {
@@ -301,6 +339,20 @@ function ProjectDetails() {
     }
   }
 
+  const totalTasks = tasks.length
+
+  const completedTasks = tasks.filter(
+    (task) => task.status === 'completed',
+  ).length
+
+  const inProgressTasks = tasks.filter(
+    (task) => task.status === 'in-progress',
+  ).length
+
+  const todoTasks = tasks.filter(
+    (task) => task.status === 'todo',
+  ).length
+
   if (loading) {
     return (
       <p className="text-sm text-gray-500">
@@ -384,6 +436,50 @@ function ProjectDetails() {
           </Button>
         </div>
       </Card>
+
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Project Progress
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Track completed tasks for this project.
+            </p>
+          </div>
+
+          {!progressLoading && progress && (
+            <span className="text-2xl font-bold text-gray-900">
+              {progress.progress}%
+            </span>
+          )}
+        </div>
+        {/* Progress bar and task count */}
+        {progressLoading ? (
+          <p className="mt-4 text-sm text-gray-500">
+            Loading progress...
+          </p>
+        ) : progressError ? (
+          <p className="mt-4 text-sm text-red-600">
+            {progressError}
+          </p>
+        ) : progress ? (
+          <div className="mt-4">
+            <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
+              <div
+                className="h-full rounded-full bg-gray-900 transition-all"
+                style={{ width: `${progress.progress}%` }}
+              />
+            </div>
+
+            <p className="mt-2 text-sm text-gray-600">
+              {progress.completedTasks} of {progress.totalTasks} tasks
+              completed
+            </p>
+          </div>
+        ) : null}
+      </div>
 
       {/* Team members */}
       <Card className="mt-6">
@@ -543,6 +639,37 @@ function ProjectDetails() {
           </button>
         </div>
       </form>
+
+      {/* Task statistics */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-4">
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-sm text-gray-500">Total Tasks</p>
+          <p className="mt-1 text-2xl font-semibold text-gray-900">
+            {totalTasks}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-sm text-gray-500">To Do</p>
+          <p className="mt-1 text-2xl font-semibold text-gray-900">
+            {todoTasks}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-sm text-gray-500">In Progress</p>
+          <p className="mt-1 text-2xl font-semibold text-gray-900">
+            {inProgressTasks}
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <p className="text-sm text-gray-500">Completed</p>
+          <p className="mt-1 text-2xl font-semibold text-gray-900">
+            {completedTasks}
+          </p>
+        </div>
+      </div>
 
       {/* Tasks list */}
       <div className="mt-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
