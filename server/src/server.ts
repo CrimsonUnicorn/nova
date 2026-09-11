@@ -7,6 +7,7 @@ import healthRoutes from './routes/healthRoutes.js'
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import commentRoutes from './routes/commentRoutes'
+import userRoutes from './routes/userRoute.js'
 
 
 const app = express()
@@ -26,13 +27,14 @@ app.use('/api/auth', authRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api', commentRoutes)
+app.use('/api/users', userRoutes)
 
 app.get("/", (req, res) => {
   res.send("NOVA API is working!");
 });
 
 connectDatabase().then(() => {
-  app.listen(Number(process.env.PORT), '0.0.0.0', () => {
+  app.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`NOVA API running on port ${PORT}`)
   })
 })

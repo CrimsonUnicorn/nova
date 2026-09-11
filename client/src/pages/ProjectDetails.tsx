@@ -5,6 +5,11 @@ import Card from '../components/Card'
 import Button from '../components/Button'
 import type { SyntheticEvent } from 'react'
 
+import {
+  searchUsers,
+  type SearchUser,
+} from '../services/userService'
+
 import { apiRequest } from '../services/api'
 import {
   addProjectMember,
@@ -44,6 +49,11 @@ function ProjectDetails() {
 
   const [members, setMembers] = useState<ProjectMember[]>([])
   const [userId, setUserId] = useState('')
+
+  const [userSearch, setUserSearch] = useState('')
+  const [userResults, setUserResults] = useState<SearchUser[]>([])
+  const [searchingUsers, setSearchingUsers] = useState(false)
+
   const [memberError, setMemberError] = useState('')
   const [memberLoading, setMemberLoading] = useState(false)
   const [membersLoading, setMembersLoading] = useState(true)
@@ -194,6 +204,40 @@ function ProjectDetails() {
     }
   }
 
+  async function handleUserSearch(value: string) {
+    setUserSearch(value)
+    setUserId('')
+
+    if (!value.trim()) {
+      setUserResults([])
+      return
+    }
+
+    try {
+      setSearchingUsers(true)
+      setMemberError('')
+
+      const results = await searchUsers(value.trim())
+
+      const filteredResults = results.filter(
+        (user) =>
+          user.id !== project?.owner &&
+          !members.some((member) => member._id === user.id),
+      )
+
+      setUserResults(filteredResults)
+    } catch (error) {
+      setMemberError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to search users',
+      )
+      setUserResults([])
+    } finally {
+      setSearchingUsers(false)
+    }
+  }
+
   async function handleAddMember(
     event: React.SyntheticEvent<HTMLFormElement>,
   ) {
@@ -211,6 +255,8 @@ function ProjectDetails() {
       setMembers(updatedMembers)
 
       setUserId('')
+      setUserSearch('')
+      setUserResults([])
     } catch (error) {
       setMemberError(
         error instanceof Error
@@ -544,15 +590,57 @@ function ProjectDetails() {
           onSubmit={handleAddMember}
           className="flex flex-col gap-3 sm:flex-row"
         >
-          <input
-            type="text"
-            value={userId}
-            onChange={(event) => setUserId(event.target.value)}
-            placeholder="Enter user ID"
-            className="flex-1 rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
-          />
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={userSearch}
+              onChange={(event) =>
+                void handleUserSearch(event.target.value)
+              }
+              placeholder="Search by name or email..."
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+            />
 
-          <Button type="submit" disabled={memberLoading}>
+            {userSearch.trim() && (
+              <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-lg">
+                {searchingUsers ? (
+                  <p className="px-4 py-3 text-sm text-gray-500">
+                    Searching...
+                  </p>
+                ) : userResults.length === 0 ? (
+                  <p className="px-4 py-3 text-sm text-gray-500">
+                    No users found.
+                  </p>
+                ) : (
+                  userResults.map((user) => (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => {
+                        setUserId(user.id)
+                        setUserSearch(user.name)
+                        setUserResults([])
+                      }}
+                      className="block w-full border-b border-gray-800 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-gray-800"
+                    >
+                      <p className="text-sm font-medium text-gray-200">
+                        {user.name}
+                      </p>
+
+                      <p className="mt-1 text-xs text-gray-500">
+                        {user.email}
+                      </p>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={memberLoading || !userId}
+          >
             {memberLoading ? 'Adding...' : 'Add Member'}
           </Button>
         </form>
