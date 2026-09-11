@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { loginUser } from '../services/authService'
+import { useAuth } from '../context/AuthContext'
 
 function Login() {
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -34,7 +36,7 @@ function Login() {
     try {
       const data = await loginUser(trimmedEmail, password)
 
-      localStorage.setItem('nova_token', data.token)
+      login(data.user, data.token)
 
       navigate('/dashboard')
     } catch (error) {
