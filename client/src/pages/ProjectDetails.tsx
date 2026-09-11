@@ -385,6 +385,10 @@ function ProjectDetails() {
           task._id === updatedTask._id ? updatedTask : task,
         ),
       )
+      if (id) {
+        const progressData = await getProjectProgress(id)
+        setProgress(progressData)
+      }
     } catch (err) {
       setUpdateTaskError({
         taskId,
