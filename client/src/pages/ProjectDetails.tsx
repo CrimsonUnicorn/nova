@@ -49,7 +49,6 @@ function ProjectDetails() {
 
   const [members, setMembers] = useState<ProjectMember[]>([])
   const [userId, setUserId] = useState('')
-
   const [userSearch, setUserSearch] = useState('')
   const [userResults, setUserResults] = useState<SearchUser[]>([])
   const [searchingUsers, setSearchingUsers] = useState(false)
@@ -70,18 +69,28 @@ function ProjectDetails() {
   const [taskDueDate, setTaskDueDate] = useState('')
   const [creatingTask, setCreatingTask] = useState(false)
   const [createTaskError, setCreateTaskError] = useState('')
-  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null)
+
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(
+    null,
+  )
+
   const [updateTaskError, setUpdateTaskError] = useState<{
     taskId: string
     message: string
   } | null>(null)
-  const [assigningTaskId, setAssigningTaskId] = useState<string | null>(null)
+
+  const [assigningTaskId, setAssigningTaskId] = useState<string | null>(
+    null,
+  )
+
   const [assignTaskError, setAssignTaskError] = useState<{
     taskId: string
     message: string
   } | null>(null)
 
-  const [progress, setProgress] = useState<ProjectProgress | null>(null)
+  const [progress, setProgress] = useState<ProjectProgress | null>(
+    null,
+  )
   const [progressLoading, setProgressLoading] = useState(true)
   const [progressError, setProgressError] = useState('')
 
@@ -252,8 +261,8 @@ function ProjectDetails() {
       await addProjectMember(id, userId.trim())
 
       const updatedMembers = await getProjectMembers(id)
-      setMembers(updatedMembers)
 
+      setMembers(updatedMembers)
       setUserId('')
       setUserSearch('')
       setUserResults([])
@@ -283,6 +292,7 @@ function ProjectDetails() {
       await removeProjectMember(id, userId)
 
       const updatedMembers = await getProjectMembers(id)
+
       setMembers(updatedMembers)
     } catch (err) {
       setMemberError(
@@ -385,6 +395,7 @@ function ProjectDetails() {
           task._id === updatedTask._id ? updatedTask : task,
         ),
       )
+
       if (id) {
         const progressData = await getProjectProgress(id)
         setProgress(progressData)
@@ -489,52 +500,56 @@ function ProjectDetails() {
 
       {/* Project information */}
       <Card>
-        <h2 className="text-lg font-semibold text-white">
-          Description
-        </h2>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold text-white">
+              Description
+            </h2>
 
-        <p className="mt-2 text-sm leading-6 text-gray-400">
-          {project.description || 'No description provided.'}
-        </p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-gray-400">
+              {project.description || 'No description provided.'}
+            </p>
 
-        <div className="mt-6 space-y-2 text-sm text-gray-500">
-          <p>
-            Created:{' '}
-            {new Date(project.createdAt).toLocaleDateString()}
-          </p>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500">
+              <span>
+                Created{' '}
+                {new Date(project.createdAt).toLocaleDateString()}
+              </span>
 
-          <p>
-            Last updated:{' '}
-            {new Date(project.updatedAt).toLocaleDateString()}
-          </p>
+              <span>
+                Updated{' '}
+                {new Date(project.updatedAt).toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 gap-3">
+            <Link to="/projects">
+              <Button type="button">
+                Back to Projects
+              </Button>
+            </Link>
+
+            <Button
+              type="button"
+              variant="danger"
+              disabled={deleting}
+              onClick={handleDelete}
+            >
+              {deleting ? 'Deleting...' : 'Delete Project'}
+            </Button>
+          </div>
         </div>
 
         {error && (
-          <p className="mt-4 rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
+          <p className="mt-5 rounded-lg border border-red-900/50 bg-red-950/40 p-3 text-sm text-red-300">
             {error}
           </p>
         )}
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link to="/projects">
-            <Button type="button">
-              Back to Projects
-            </Button>
-          </Link>
-
-          <Button
-            type="button"
-            variant="danger"
-            disabled={deleting}
-            onClick={handleDelete}
-          >
-            {deleting ? 'Deleting...' : 'Delete Project'}
-          </Button>
-        </div>
       </Card>
 
       {/* Project progress */}
-      <div className="mt-6 rounded-xl border border-gray-800 bg-gray-900 p-6">
+      <div className="mt-5 rounded-xl border border-gray-800 bg-gray-900 p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-white">
@@ -562,7 +577,7 @@ function ProjectDetails() {
             {progressError}
           </p>
         ) : progress ? (
-          <div className="mt-5">
+          <div className="mt-4">
             <div className="h-2 w-full overflow-hidden rounded-full bg-gray-800">
               <div
                 className="h-full rounded-full bg-indigo-500 transition-all duration-500"
@@ -579,7 +594,7 @@ function ProjectDetails() {
       </div>
 
       {/* Team members */}
-      <Card className="mt-6">
+      <Card className="mt-5">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-white">
             Team Members
@@ -592,9 +607,9 @@ function ProjectDetails() {
 
         <form
           onSubmit={handleAddMember}
-          className="flex flex-col gap-3 sm:flex-row"
+          className="flex flex-col gap-2 sm:flex-row"
         >
-          <div className="relative flex-1">
+          <div className="relative min-w-0 flex-1">
             <input
               type="text"
               value={userSearch}
@@ -606,7 +621,7 @@ function ProjectDetails() {
             />
 
             {userSearch.trim() && (
-              <div className="absolute z-10 mt-2 w-full overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-lg">
+              <div className="absolute z-20 mt-2 w-full overflow-hidden rounded-lg border border-gray-800 bg-gray-900 shadow-xl">
                 {searchingUsers ? (
                   <p className="px-4 py-3 text-sm text-gray-500">
                     Searching...
@@ -644,6 +659,7 @@ function ProjectDetails() {
           <Button
             type="submit"
             disabled={memberLoading || !userId}
+            className="sm:min-w-[120px]"
           >
             {memberLoading ? 'Adding...' : 'Add Member'}
           </Button>
@@ -655,7 +671,7 @@ function ProjectDetails() {
           </p>
         )}
 
-        <div className="mt-6 space-y-3">
+        <div className="mt-5 space-y-3">
           {membersLoading ? (
             <p className="text-sm text-gray-500">
               Loading team members...
@@ -696,7 +712,7 @@ function ProjectDetails() {
       </Card>
 
       {/* Create task */}
-      <Card className="mt-6">
+      <Card className="mt-5">
         <div className="mb-5">
           <h2 className="text-lg font-semibold text-white">
             Create Task
@@ -759,9 +775,9 @@ function ProjectDetails() {
                 onChange={(event) =>
                   setTaskPriority(
                     event.target.value as
-                    | 'low'
-                    | 'medium'
-                    | 'high',
+                      | 'low'
+                      | 'medium'
+                      | 'high',
                   )
                 }
                 className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
@@ -781,7 +797,7 @@ function ProjectDetails() {
                 type="date"
                 value={taskDueDate}
                 onChange={(event) => setTaskDueDate(event.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+                className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
               />
             </div>
           </div>
@@ -793,8 +809,8 @@ function ProjectDetails() {
       </Card>
 
       {/* Task statistics */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Card className="p-5">
           <p className="text-sm text-gray-500">Total Tasks</p>
 
           <p className="mt-2 text-2xl font-semibold text-white">
@@ -802,7 +818,7 @@ function ProjectDetails() {
           </p>
         </Card>
 
-        <Card>
+        <Card className="p-5">
           <p className="text-sm text-gray-500">To Do</p>
 
           <p className="mt-2 text-2xl font-semibold text-white">
@@ -810,7 +826,7 @@ function ProjectDetails() {
           </p>
         </Card>
 
-        <Card>
+        <Card className="p-5">
           <p className="text-sm text-gray-500">In Progress</p>
 
           <p className="mt-2 text-2xl font-semibold text-indigo-400">
@@ -818,7 +834,7 @@ function ProjectDetails() {
           </p>
         </Card>
 
-        <Card>
+        <Card className="p-5">
           <p className="text-sm text-gray-500">Completed</p>
 
           <p className="mt-2 text-2xl font-semibold text-emerald-400">
@@ -828,7 +844,7 @@ function ProjectDetails() {
       </div>
 
       {/* Tasks list */}
-      <Card className="mt-6">
+      <Card className="mt-5">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold text-white">
@@ -942,7 +958,8 @@ function ProjectDetails() {
 
                   {task.dueDate && (
                     <span className="rounded-lg bg-gray-900 px-3 py-2 text-xs text-gray-500">
-                      Due: {new Date(task.dueDate).toLocaleDateString()}
+                      Due:{' '}
+                      {new Date(task.dueDate).toLocaleDateString()}
                     </span>
                   )}
 

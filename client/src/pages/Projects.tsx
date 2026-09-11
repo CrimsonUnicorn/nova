@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+
 import PageTitle from '../components/PageTitle'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import { apiRequest } from '../services/api'
-import { Link } from 'react-router-dom'
 
 interface Project {
   _id: string
@@ -109,11 +110,11 @@ function Projects() {
 
       <Card>
         <div>
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-gray-100">
             Create Project
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-400">
             Start a new workspace for your team.
           </p>
         </div>
@@ -136,7 +137,7 @@ function Projects() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               placeholder="e.g. Website Redesign"
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-600 transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -156,7 +157,7 @@ function Projects() {
               }
               placeholder="What is this project about?"
               rows={3}
-              className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+              className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-600 transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
             />
           </div>
 
@@ -175,7 +176,7 @@ function Projects() {
       </Card>
 
       {error && (
-        <div className="mt-4 rounded-xl border border-red-900/50 bg-red-950/40 p-4">
+        <div className="mt-5 rounded-xl border border-red-900/50 bg-red-950/40 p-4">
           <p className="text-sm text-red-300">{error}</p>
 
           <button
@@ -192,13 +193,13 @@ function Projects() {
         </div>
       )}
 
-      <div className="mt-8">
+      <div className="mt-6">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-gray-100">
             Your Projects
           </h2>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-400">
             {projects.length} project
             {projects.length === 1 ? '' : 's'} in your workspace
           </p>
@@ -219,7 +220,7 @@ function Projects() {
                 No projects yet
               </p>
 
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-gray-500">
                 Create your first project above to get started.
               </p>
             </div>
@@ -236,25 +237,25 @@ function Projects() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h3 className="truncate text-base font-semibold text-gray-200 transition-colors group-hover:text-white">
+                      <h3 className="truncate text-base font-semibold text-gray-200 transition-colors group-hover:text-gray-100">
                         {project.name}
                       </h3>
 
-                      <div className="mt-2 h-1 w-10 rounded-full bg-indigo-500" />
+                      <div className="mt-2 h-1 w-10 rounded-full bg-indigo-500 transition-all duration-200 group-hover:w-14" />
                     </div>
 
-                    <span className="text-gray-600 transition-transform group-hover:translate-x-1">
+                    <span className="text-gray-600 transition-all duration-200 group-hover:translate-x-1 group-hover:text-indigo-400">
                       →
                     </span>
                   </div>
 
-                  <p className="mt-4 line-clamp-3 text-sm leading-6 text-gray-500">
+                  <p className="mt-4 line-clamp-3 text-sm leading-6 text-gray-400">
                     {project.description ||
                       'No description provided.'}
                   </p>
 
-                  <div className="mt-6 border-t border-gray-800 pt-4">
-                    <p className="text-xs text-gray-600">
+                  <div className="mt-6 border-t border-gray-800/80 pt-4">
+                    <p className="text-xs text-gray-500">
                       Created{' '}
                       {new Date(
                         project.createdAt,

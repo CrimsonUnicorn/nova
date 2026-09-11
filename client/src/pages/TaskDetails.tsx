@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+
 import PageTitle from '../components/PageTitle'
 import Card from '../components/Card'
 import Button from '../components/Button'
@@ -25,7 +26,9 @@ function TaskDetails() {
   const [commentsLoading, setCommentsLoading] = useState(false)
   const [commentContent, setCommentContent] = useState('')
   const [commentSubmitting, setCommentSubmitting] = useState(false)
-  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null)
+  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+    null,
+  )
 
   useEffect(() => {
     if (!id) {
@@ -169,7 +172,7 @@ function TaskDetails() {
         />
 
         <Card>
-          <p className="text-sm text-red-400">
+          <p className="text-sm text-red-300">
             {error || 'Task not found'}
           </p>
 
@@ -177,7 +180,7 @@ function TaskDetails() {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-3 text-sm font-medium text-red-400 underline hover:text-red-300"
+              className="mt-3 text-sm font-medium text-red-400 underline transition-colors hover:text-red-300"
             >
               Try again
             </button>
@@ -203,11 +206,10 @@ function TaskDetails() {
         description="View task details."
       />
 
-      {/* Task information */}
       <Card>
         <div className="space-y-7">
           <div>
-            <h2 className="text-sm font-medium text-gray-500">
+            <h2 className="text-sm font-medium text-gray-400">
               Description
             </h2>
 
@@ -217,8 +219,8 @@ function TaskDetails() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
+            <div className="rounded-xl border border-gray-800/80 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Status
               </h2>
 
@@ -227,8 +229,8 @@ function TaskDetails() {
               </p>
             </div>
 
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
+            <div className="rounded-xl border border-gray-800/80 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Priority
               </h2>
 
@@ -237,8 +239,8 @@ function TaskDetails() {
               </p>
             </div>
 
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
+            <div className="rounded-xl border border-gray-800/80 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Due Date
               </h2>
 
@@ -249,8 +251,8 @@ function TaskDetails() {
               </p>
             </div>
 
-            <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
-              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-600">
+            <div className="rounded-xl border border-gray-800/80 bg-gray-950 p-4">
+              <h2 className="text-xs font-medium uppercase tracking-wide text-gray-500">
                 Assigned To
               </h2>
 
@@ -270,15 +272,14 @@ function TaskDetails() {
         </div>
       </Card>
 
-      {/* Comments */}
-      <Card className="mt-6">
+      <Card className="mt-5">
         <div className="mb-5 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-white">
+            <h2 className="text-xl font-semibold text-gray-100">
               Comments
             </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-400">
               Discuss this task with your team.
             </p>
           </div>
@@ -289,7 +290,6 @@ function TaskDetails() {
           </span>
         </div>
 
-        {/* Add Comment */}
         <form
           onSubmit={handleAddComment}
           className="mb-6"
@@ -309,7 +309,7 @@ function TaskDetails() {
             }
             placeholder="Write a comment..."
             rows={3}
-            className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-200 outline-none placeholder:text-gray-600 transition-colors focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
+            className="w-full resize-none rounded-lg border border-gray-700 bg-gray-950 px-3 py-2.5 text-sm text-gray-100 outline-none placeholder:text-gray-600 transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
           />
 
           <div className="mt-3 flex justify-end">
@@ -318,7 +318,7 @@ function TaskDetails() {
               disabled={
                 commentSubmitting || !commentContent.trim()
               }
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-indigo-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-200 hover:bg-indigo-400 active:bg-indigo-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {commentSubmitting ? 'Adding...' : 'Add Comment'}
             </button>
@@ -334,7 +334,7 @@ function TaskDetails() {
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="mt-2 text-sm font-medium text-red-400 underline hover:text-red-300"
+              className="mt-2 text-sm font-medium text-red-400 underline transition-colors hover:text-red-300"
             >
               Try again
             </button>
@@ -351,7 +351,7 @@ function TaskDetails() {
               No comments yet.
             </p>
 
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs text-gray-500">
               Start the conversation about this task.
             </p>
           </div>
@@ -360,15 +360,15 @@ function TaskDetails() {
             {comments.map((comment) => (
               <div
                 key={comment._id}
-                className="rounded-xl border border-gray-800 bg-gray-950 p-4 transition-colors hover:border-gray-700"
+                className="rounded-xl border border-gray-800/80 bg-gray-950 p-4 transition-colors hover:border-gray-700"
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-200">
                       {comment.author.name}
                     </p>
 
-                    <p className="mt-1 text-xs text-gray-600">
+                    <p className="mt-1 text-xs text-gray-500">
                       {new Date(
                         comment.createdAt,
                       ).toLocaleString()}
@@ -384,7 +384,7 @@ function TaskDetails() {
                       onClick={() =>
                         handleDeleteComment(comment._id)
                       }
-                      className="text-xs font-medium text-red-400 transition-colors hover:text-red-300 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                      className="shrink-0 text-xs font-medium text-red-400 transition-colors hover:text-red-300 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {deletingCommentId === comment._id
                         ? 'Deleting...'

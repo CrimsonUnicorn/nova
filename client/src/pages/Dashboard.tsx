@@ -103,72 +103,70 @@ function Dashboard() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium text-gray-400">
                 Total Projects
               </p>
 
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-gray-100">
                 {loading ? '...' : totalProjects}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+            <div className="rounded-lg bg-indigo-500/10 px-3 py-2 text-xs font-medium text-indigo-400">
               Projects
             </div>
           </div>
         </Card>
 
         <Card>
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium text-gray-400">
                 Total Tasks
               </p>
 
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-gray-100">
                 {loading ? '...' : totalTasks}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+            <div className="rounded-lg bg-indigo-500/10 px-3 py-2 text-xs font-medium text-indigo-400">
               Tasks
             </div>
           </div>
         </Card>
 
         <Card>
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-gray-500">
+              <p className="text-sm font-medium text-gray-400">
                 Completed
               </p>
 
-              <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
+              <p className="mt-3 text-3xl font-semibold tracking-tight text-gray-100">
                 {loading ? '...' : completedTasks}
               </p>
             </div>
 
-            <div className="rounded-lg bg-gray-800 px-3 py-2 text-xs text-gray-400">
+            <div className="rounded-lg bg-indigo-500/10 px-3 py-2 text-xs font-medium text-indigo-400">
               Done
             </div>
           </div>
         </Card>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-5">
         <Card>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-white">
-                Project Progress
-              </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-100">
+              Project Progress
+            </h2>
 
-              <p className="mt-1 text-sm text-gray-500">
-                Track how your projects are moving forward.
-              </p>
-            </div>
+            <p className="mt-1 text-sm text-gray-400">
+              Track how your projects are moving forward.
+            </p>
           </div>
 
           {loading ? (
@@ -181,12 +179,12 @@ function Dashboard() {
                 No projects yet.
               </p>
 
-              <p className="mt-1 text-xs text-gray-600">
+              <p className="mt-1 text-xs text-gray-500">
                 Create your first project to start tracking progress.
               </p>
             </div>
           ) : (
-            <div className="mt-6 divide-y divide-gray-800">
+            <div className="mt-6 divide-y divide-gray-800/80">
               {projects.map((project) => (
                 <div
                   key={project._id}
@@ -198,13 +196,13 @@ function Dashboard() {
                         {project.name}
                       </p>
 
-                      <p className="mt-1 text-xs text-gray-600">
+                      <p className="mt-1 text-xs text-gray-500">
                         {project.completedTasks} of{' '}
                         {project.totalTasks} tasks completed
                       </p>
                     </div>
 
-                    <p className="shrink-0 text-sm font-medium text-gray-400">
+                    <p className="shrink-0 text-sm font-medium text-indigo-400">
                       {project.progress}%
                     </p>
                   </div>
